@@ -1,0 +1,8 @@
+body {
+  margin: 0;
+  overflow: hidden;  /* スクロール無効 */
+}
+  
+canvas {
+  display: block;
+}
