@@ -39,23 +39,37 @@ window.addEventListener('wheel', (event) => {
 
 // スマホのスクロール制御
 let lastTouchY = null;
+let velocity = 0;
+let isTouching = false;
 
 window.addEventListener('touchstart', (event) => {
   lastTouchY = event.touches[0].clientY;
+});
+
+window.addEventListener('touchstart', (event) => {
+  lastTouchY = event.touches[0].clientY;
+  velocity = 0;
+  isTouching = true;
 });
 
 window.addEventListener('touchmove', (event) => {
   if (lastTouchY === null) return;
 
   const touchY = event.touches[0].clientY;
-  const deltaY = lastTouchY - touchY; // 指を上に動かすと正の値
-  camera.position.z += deltaY * 0.2; // タッチの移動量に応じてカメラ前後移動
-  camera.position.z = Math.max(-800, Math.min(0, camera.position.z)); // 範囲制限
+  const deltaY = lastTouchY - touchY;
+
+  velocity = deltaY * 0.5; // タッチ中はvelocityを更新（感度調整）
+  camera.position.z += velocity;
+  camera.position.z = Math.max(-800, Math.min(0, camera.position.z));
+
   lastTouchY = touchY;
 
-  event.preventDefault(); // スクロール自体を防ぐ
+  event.preventDefault();
 }, { passive: false });
 
+window.addEventListener('touchend', () => {
+  isTouching = false; // 指を離したら慣性モードに
+});
 
 // レンダラーを作成
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -176,7 +190,19 @@ composer.addPass(renderPass);
 // アニメーションループ
 function animate() {
   requestAnimationFrame(animate);
+
+  if (!isTouching) {
+    // 指を離した後、だんだん減速する
+    camera.position.z += velocity;
+    camera.position.z = Math.max(-800, Math.min(0, camera.position.z));
+    velocity *= 0.95; // 減速率（0.95くらいだと自然）
+    if (Math.abs(velocity) < 0.01) {
+      velocity = 0; // 小さくなったら停止
+    }
+  }
+
   water.material.uniforms['time'].value += 1.0 / 60.0;  // 時間を更新することで水面に動きを与える
+  
   composer.render();
 }
 animate();
