@@ -14,7 +14,7 @@ const scene = new THREE.Scene();
 
 const rgbeLoader = new RGBELoader();
 rgbeLoader.load(
-  "src/assets/sky.hdr",
+  "./src/assets/sky.hdr",
   (environmentMap) => {
     environmentMap.mapping = THREE.EquirectangularReflectionMapping;
     scene.background = environmentMap;
@@ -45,7 +45,7 @@ renderer.setPixelRatio(window.devicePixelRatio);
 document.body.appendChild(renderer.domElement);
 
 // 画像を読み込み
-const bgTexture = new THREE.TextureLoader().load('/src/assets/sky.jpg');
+const bgTexture = new THREE.TextureLoader().load('./src/assets/sky.jpg');
 const backgroundPlane = new THREE.Mesh(
     new THREE.PlaneGeometry(18008, 12000),
     new THREE.MeshBasicMaterial({ map: bgTexture })
@@ -55,7 +55,7 @@ scene.add(backgroundPlane);
 
 // モデルを読み込み
 const loader = new GLTFLoader();
-loader.load("/src/models/model.glb", function (gltf) {
+loader.load("./src/models/model.glb", function (gltf) {
   const loadedModel = gltf.scene;
   scene.add(loadedModel);
   loadedModel.scale.set(20, 20, 20);
