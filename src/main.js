@@ -37,6 +37,26 @@ window.addEventListener('wheel', (event) => {
   camera.position.z = Math.max(-800, Math.min(0, camera.position.z));  // 範囲制限
 });
 
+// スマホのスクロール制御
+let lastTouchY = null;
+
+window.addEventListener('touchstart', (event) => {
+  lastTouchY = event.touches[0].clientY;
+});
+
+window.addEventListener('touchmove', (event) => {
+  if (lastTouchY === null) return;
+
+  const touchY = event.touches[0].clientY;
+  const deltaY = lastTouchY - touchY; // 指を上に動かすと正の値
+  camera.position.z += deltaY * 0.2; // タッチの移動量に応じてカメラ前後移動
+  camera.position.z = Math.max(-800, Math.min(0, camera.position.z)); // 範囲制限
+  lastTouchY = touchY;
+
+  event.preventDefault(); // スクロール自体を防ぐ
+}, { passive: false });
+
+
 // レンダラーを作成
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
